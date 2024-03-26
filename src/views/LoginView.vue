@@ -18,12 +18,12 @@
               v-model="selectedUser"
               :menu-props="{ maxHeight: '400' }"
             >
-              <template v-slot:item="data">
+              <template v-slot:item="{ item }">
                 <v-list-item-content>
                   <v-list-item-avatar>
-                    <img :src="data.item.avatar">
+                    <img :src="getAvatarPath(item.avatar)">
                   </v-list-item-avatar>
-                  <v-list-item-title v-text="data.item.name"></v-list-item-title>
+                  <v-list-item-title>{{ item.name }}</v-list-item-title>
                 </v-list-item-content>
               </template>
             </v-select>
@@ -39,30 +39,36 @@
 
 <script>
 export default {
+  name: 'LoginView',
   data() {
     return {
       selectedUser: null,
-      users: [
-        { id: 1, name: "Пользователь 1", avatar: require('@/assets/images/1.jpg') },
-        { id: 2, name: "Пользователь 2", avatar: require('@/assets/images/2.jpg') },
-        { id: 3, name: "Пользователь 3", avatar: require('@/assets/images/3.jpg') },
-        { id: 4, name: "Пользователь 4", avatar: require('@/assets/images/4.jpg') },
-        { id: 5, name: "Пользователь 5", avatar: require('@/assets/images/5.jpg') },
-        { id: 6, name: "Пользователь 6", avatar: require('@/assets/images/6.jpg') },
-        { id: 7, name: "Пользователь 7", avatar: require('@/assets/images/7.jpg') },
-      ],
+      users: [],
     };
   },
+  created() {
+    this.fetchUsers();
+  },
   methods: {
-    login(user) {
-      this.selectedUser = user;
-      console.log("Вход выполнен пользователем:", this.selectedUser.name);
-      // Здесь добавьте логику для перехода на другой экран или сохранения данных пользователя
+    getAvatarPath(avatar) {
+      return `/images/${avatar}`;
+    },
+    async fetchUsers() {
+      await this.$store.dispatch('user/fetchUsers');
+      this.users = this.$store.state.user.users;
+    },
+    login() {
+      if (this.selectedUser) {
+        // Здесь может быть логика для установки выбранного пользователя
+        // в качестве активного пользователя в вашем Vuex хранилище
+        console.log("Вход выполнен пользователем:", this.selectedUser.name);
+        // Переход на страницу чата
+        this.$router.push({ name: 'chat' });
+      }
     },
   },
 };
 </script>
 
 <style>
-/* Добавьте необходимые стили, если нужно */
 </style>
