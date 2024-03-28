@@ -47,8 +47,13 @@ export default {
       this.$router.push({ name: 'login' });
     },
   },
-  created() {
-    this.initData();
+  async created() {
+    await this.$store.dispatch('user/loadCurrentUser');
+    if (!this.currentUser) {
+      this.$router.push({ name: 'login' });
+    } else {
+      await this.initData();
+    }
   },
 };
 </script>

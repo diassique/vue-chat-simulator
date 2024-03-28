@@ -10,14 +10,17 @@ const mutations = {
   SET_CURRENT_CHAT_USER(state, userId) {
     state.currentChatUser = userId;
   },
-  SET_MESSAGES(state, { conversationKey, messages }) {
-    state.messages[conversationKey] = messages;
+  SET_MESSAGES(state, messages) {
+    state.messages = messages;
   },
   SET_NEW_MESSAGE(state, message) {
     state.newMessage = message;
   },
   CLEAR_NEW_MESSAGE(state) {
     state.newMessage = null;
+  },
+  ADD_MESSAGES(state, { conversationKey, messages }) {
+    state.messages[conversationKey].push(...messages);
   },
 };
 
@@ -55,9 +58,7 @@ const actions = {
   async loadMessages({ commit }) {
     try {
       const messages = await localforage.getItem('messages') || {};
-      Object.entries(messages).forEach(([conversationKey, messages]) => {
-        commit('SET_MESSAGES', { conversationKey, messages });
-      });
+      commit('SET_MESSAGES', messages);
     } catch (error) {
       console.error("Error loading messages:", error);
     }

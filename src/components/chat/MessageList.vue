@@ -25,5 +25,20 @@ export default {
     ...mapState('user', ['currentUser']),
     ...mapState('chat', ['currentChatUser']),
   },
+  watch: {
+    messages() {
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+    },
+  },
+  mounted() {
+    this.scrollToBottom();
+  },
+  methods: {
+    scrollToBottom() {
+      this.$el.scrollTop = this.$el.scrollHeight;
+    },
+  },
 };
 </script>

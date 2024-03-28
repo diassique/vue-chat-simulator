@@ -42,23 +42,24 @@ const actions = {
     await localforage.setItem('users', updatedUsers);
     commit('SET_USERS', updatedUsers);
   },
-  async loadCurrentUser({ commit }) {
-    try {
-      const currentUser = await localforage.getItem('currentUser');
+  // upd
+  loadCurrentUser({ commit }) {
+    return new Promise((resolve) => {
+      const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
       if (currentUser) {
         commit('SET_CURRENT_USER', currentUser);
       }
-    } catch (error) {
-      console.error("Error loading current user:", error);
-    }
+      resolve();
+    });
   },
+  // upd
   setCurrentUser({ commit }, user) {
     commit('SET_CURRENT_USER', user);
-    localforage.setItem('currentUser', user);
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
   },
   logout({ commit }) {
     commit('SET_CURRENT_USER', null);
-    localforage.removeItem('currentUser');
+    sessionStorage.removeItem('currentUser');
   },
 };
 

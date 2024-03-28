@@ -1,7 +1,6 @@
 <template>
   <v-list dense subheader class="overflow-y-auto" style="max-height: 500px;">
     <v-subheader>Пользователи</v-subheader>
-    <!-- Loop through filtered users instead of all users -->
     <template v-for="user in filteredUsers">
       <v-list-item :key="user.id" @click="selectUser(user)" :class="{'active-user': user.id === currentChatUser}">
         <v-list-item-avatar color="grey lighten-1">

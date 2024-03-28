@@ -50,6 +50,14 @@ export default {
       });
       this.newMessage = '';
     },
+    // Uncomment to allow real-time chat simultaion
+    // async fetchMessages() {
+    //   await this.loadMessages();
+    //   setTimeout(this.fetchMessages, 1000);
+    // },
   },
+  // mounted() {
+  //   this.fetchMessages();
+  // },
 };
 </script>
