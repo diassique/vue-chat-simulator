@@ -26,7 +26,8 @@ const routes = [
 
 const router = new Router({
   mode: 'history',
-  routes
+  base: process.env.NODE_ENV === 'production' ? '/vue-chat-simulator/' : '/',
+  routes,
 });
 
 router.beforeEach((to, from, next) => {
