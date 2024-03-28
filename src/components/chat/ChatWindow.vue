@@ -10,7 +10,7 @@
           />
         </v-card>
         <v-text-field
-          class="mt-5"
+          class="mt-2"
           v-model="newMessage"
           append-icon="mdi-send"
           label="Напишите сообщение..."
