@@ -1,13 +1,17 @@
 import localforage from 'localforage';
 
 const state = {
-  users: []
+  users: [],
+  currentUser: null,
 };
 
 const mutations = {
   SET_USERS(state, users) {
     state.users = users;
-  }
+  },
+  SET_CURRENT_USER(state, user) {
+    state.currentUser = user;
+  },
 };
 
 const actions = {
@@ -17,16 +21,14 @@ const actions = {
       if (users) {
         commit('SET_USERS', users);
       } else {
-        // Здесь можно добавить логику для инициализации пользователей,
-        // если в localForage они не найдены. Например:
         const initialUsers = [
-          { id: 1, name: "Пользователь 1", avatar: '1.jpg' },
-          { id: 2, name: "Пользователь 2", avatar: '2.jpg' },
-          { id: 3, name: "Пользователь 3", avatar: '3.jpg' },
-          { id: 4, name: "Пользователь 4", avatar: '4.jpg' },
-          { id: 5, name: "Пользователь 5", avatar: '5.jpg' },
-          { id: 6, name: "Пользователь 6", avatar: '6.jpg' },
-          { id: 7, name: "Пользователь 7", avatar: '7.jpg' },
+          { id: 1, name: "Aibar Muratov", avatar: '1.jpg' },
+          { id: 2, name: "Nurlan Kazybekov", avatar: '2.jpg' },
+          { id: 3, name: "Alexander Orlov", avatar: '3.jpg' },
+          { id: 4, name: "Katerine Pavlova", avatar: '4.jpg' },
+          { id: 5, name: "Aizhan Zhunusova", avatar: '5.jpg' },
+          { id: 6, name: "Bauyrzhan Bekmukhanbetov", avatar: '6.jpg' },
+          { id: 7, name: "Gulnaz Sadykova", avatar: '7.jpg' },
         ];
         await localforage.setItem('users', initialUsers);
         commit('SET_USERS', initialUsers);
@@ -39,12 +41,35 @@ const actions = {
     const updatedUsers = [...state.users, user];
     await localforage.setItem('users', updatedUsers);
     commit('SET_USERS', updatedUsers);
-  }
+  },
+  async loadCurrentUser({ commit }) {
+    try {
+      const currentUser = await localforage.getItem('currentUser');
+      if (currentUser) {
+        commit('SET_CURRENT_USER', currentUser);
+      }
+    } catch (error) {
+      console.error("Error loading current user:", error);
+    }
+  },
+  setCurrentUser({ commit }, user) {
+    commit('SET_CURRENT_USER', user);
+    localforage.setItem('currentUser', user);
+  },
+  logout({ commit }) {
+    commit('SET_CURRENT_USER', null);
+    localforage.removeItem('currentUser');
+  },
+};
+
+const getters = {
+  currentUser: state => state.currentUser,
 };
 
 export default {
   namespaced: true,
   state,
   mutations,
-  actions
+  actions,
+  getters
 };

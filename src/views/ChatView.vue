@@ -1,12 +1,21 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col cols="3">
-        <UserSelect :users="users" @userSelected="onUserSelected" />
-        <UserList :users="users" @userSelected="onUserSelected" />
-      </v-col>
-      <v-col cols="9">
-        <ChatWindow :messages="messages" @sendMessage="onSendMessage" />
+  <v-container fluid>
+    <v-row justify="center">
+      <v-col cols="12" md="10" lg="8">
+        <v-row class="chat-layout">
+          <v-col cols="4" class="user-list">
+            <div v-if="currentUser" class="greeting">
+              Привет, {{ currentUser.name }}!
+            </div>
+            <UserList :users="users" />
+            <v-btn color="red" outlined block class="mt-3 logout-button" @click="logout">
+              Выход
+            </v-btn>
+          </v-col>
+          <v-col cols="8" class="chat-window">
+            <ChatWindow />
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>
@@ -14,36 +23,55 @@
 
 <script>
 import UserList from '@/components/user/UserList.vue';
-import UserSelect from '@/components/user/UserSelect.vue';
 import ChatWindow from '@/components/chat/ChatWindow.vue';
+import { mapActions, mapState } from 'vuex';
 
 export default {
+  name: 'ChatView',
   components: {
     UserList,
-    UserSelect,
-    ChatWindow
+    ChatWindow,
   },
-  data() {
-    return {
-      users: [
-        // Здесь будут данные пользователей
-      ],
-      messages: [
-        // Здесь будут данные сообщений
-      ],
-    };
+  computed: {
+    ...mapState('user', ['users', 'currentUser']),
   },
   methods: {
-    onUserSelected(user) {
-      // Обработка выбора пользователя
+    ...mapActions('user', ['fetchUsers', 'logout']),
+    ...mapActions('chat', ['loadMessages']),
+    async initData() {
+      await this.fetchUsers();
+      await this.loadMessages();
     },
-    onSendMessage(message) {
-      // Обработка отправки сообщения
+    logout() {
+      this.$store.dispatch('user/logout');
+      this.$router.push({ name: 'login' });
     },
+  },
+  created() {
+    this.initData();
   },
 };
 </script>
 
-<style>
-/* Стилизация */
+<style scoped>
+.chat-layout {
+  display: flex;
+  height: 500px;
+}
+.user-list {
+  overflow-y: auto;
+  border-right: 1px solid #e0e0e0;
+}
+.chat-window {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.logout-button {
+  border-width: 2px !important;
+}
+.logout-button:hover {
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}
 </style>

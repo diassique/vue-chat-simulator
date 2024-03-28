@@ -2,23 +2,19 @@
   <v-container>
     <v-row>
       <v-col>
-        <v-card class="pa-2">
-          <v-list dense>
-            <!-- Сообщения -->
-            <v-list-item v-for="message in messages" :key="message.id">
-              <v-list-item-content>
-                <v-list-item-title v-text="message.text"></v-list-item-title>
-                <v-list-item-subtitle v-text="message.time"></v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
+        <v-card class="pa-2" height="500px" style="overflow-y: auto">
+          <MessageList
+            :messages="currentConversationMessages"
+            :currentUser="currentUser"
+            :currentChatUser="currentChatUser"
+          />
         </v-card>
-        <!-- Форма отправки -->
         <v-text-field
+          class="mt-5"
           v-model="newMessage"
           append-icon="mdi-send"
           label="Напишите сообщение..."
-          @click:append="sendMessage"
+          @click:append="send"
           outlined
         ></v-text-field>
       </v-col>
@@ -27,19 +23,31 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from 'vuex';
+import MessageList from './MessageList.vue';
+
 export default {
-  name: 'ChatWindow',
-  props: {
-    messages: Array,
+  components: {
+    MessageList,
   },
   data() {
     return {
       newMessage: '',
     };
   },
+  computed: {
+    ...mapState('user', ['currentUser']),
+    ...mapState('chat', ['currentChatUser']),
+    ...mapGetters('chat', ['currentConversationMessages']),
+  },
   methods: {
-    sendMessage() {
-      this.$emit('sendMessage', this.newMessage);
+    ...mapActions('chat', ['sendMessage', 'loadMessages']),
+    async send() {
+      if (!this.newMessage.trim()) return;
+      await this.sendMessage({
+        text: this.newMessage,
+        receiverId: this.currentChatUser,
+      });
       this.newMessage = '';
     },
   },

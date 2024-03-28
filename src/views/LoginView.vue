@@ -13,19 +13,21 @@
               item-value="id"
               label="Выберите пользователя"
               return-object
-              @change="login"
-              prepend-icon="mdi-account-circle"
+              prepend-icon="mdi-account-circle mdi-36px"
               v-model="selectedUser"
               :menu-props="{ maxHeight: '400' }"
             >
-              <template v-slot:item="{ item }">
+            <template v-slot:item="{ item, on }">
+              <v-list-item :value="item" @click="on.click">
+                <v-list-item-avatar class="mr-3">
+                  <img :src="getAvatarPath(item.avatar)" class="avatar-image">
+                </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-avatar>
-                    <img :src="getAvatarPath(item.avatar)">
-                  </v-list-item-avatar>
                   <v-list-item-title>{{ item.name }}</v-list-item-title>
                 </v-list-item-content>
-              </template>
+              </v-list-item>
+            </template>
+
             </v-select>
           </v-card-text>
           <v-card-actions>
@@ -51,24 +53,29 @@ export default {
   },
   methods: {
     getAvatarPath(avatar) {
-      return `/images/${avatar}`;
+      const imageName = avatar.replace('@/assets/images/', '');
+      return `/assets/images/${imageName}`;
     },
     async fetchUsers() {
       await this.$store.dispatch('user/fetchUsers');
       this.users = this.$store.state.user.users;
     },
-    login() {
-      if (this.selectedUser) {
-        // Здесь может быть логика для установки выбранного пользователя
-        // в качестве активного пользователя в вашем Vuex хранилище
-        console.log("Вход выполнен пользователем:", this.selectedUser.name);
-        // Переход на страницу чата
-        this.$router.push({ name: 'chat' });
+    async login() {
+      if (this.selectedUser && this.selectedUser.id) {
+        await this.$store.dispatch('user/setCurrentUser', this.selectedUser);
+        await this.$store.dispatch('chat/loadMessages');
+        this.$router.push({ name: 'chat' }).catch(err => console.error(err));
       }
     },
   },
 };
 </script>
 
-<style>
+<style scoped>
+.avatar-image {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 40px;
+  height: 40px;
+}
 </style>
